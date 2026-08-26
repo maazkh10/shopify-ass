@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "hello_world": {
+      "type": "hello-world",
+      "settings": {
+        "heading": "HELLO SHOPIFY 👋",
+        "description": "My Shopify theme is working!"
+      }
+    }
+  },
+  "order": [
+    "hello_world"
+  ]
+}

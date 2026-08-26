@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Theme settings",
+    "settings": [
+      {
+        "type": "text",
+        "id": "theme_note",
+        "label": "Theme note",
+        "default": "My Shopify theme"
+      }
+    ]
+  }
+]
