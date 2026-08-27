@@ -1,0 +1,178 @@
+<section class="test-2-product-page">
+
+  <div class="test-2-product-page__inner">
+
+    <div class="test-2-product-page__image">
+
+      {% if product.featured_image != blank %}
+
+        {{
+          product.featured_image
+          | image_url: width: 1000
+          | image_tag:
+            loading: 'eager',
+            widths: '500, 700, 900, 1000',
+            sizes: '(min-width: 750px) 50vw, 100vw',
+            alt: product.featured_image.alt | default: product.title
+        }}
+
+      {% else %}
+
+        <div class="test-2-product-page__placeholder">
+          Image unavailable
+        </div>
+
+      {% endif %}
+
+    </div>
+
+
+    <div class="test-2-product-page__content">
+
+      <p class="test-2-product-page__vendor">
+        {{ product.vendor }}
+      </p>
+
+      <h1>
+        {{ product.title }}
+      </h1>
+
+      <div class="test-2-product-page__price">
+        {{ product.selected_or_first_available_variant.price | money }}
+      </div>
+
+      {% if product.description != blank %}
+        <div class="test-2-product-page__description">
+          {{ product.description }}
+        </div>
+      {% endif %}
+
+      {% form 'product', product %}
+
+        <input
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+        >
+
+        <button
+          type="submit"
+          class="test-2-product-page__button"
+          {% unless product.selected_or_first_available_variant.available %}
+            disabled
+          {% endunless %}
+        >
+          {% if product.selected_or_first_available_variant.available %}
+            Add to cart
+          {% else %}
+            Sold out
+          {% endif %}
+        </button>
+
+      {% endform %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<style>
+
+.test-2-product-page {
+  width: 100%;
+  padding: 60px 30px;
+}
+
+.test-2-product-page__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+
+.test-2-product-page__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.test-2-product-page__placeholder {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+}
+
+.test-2-product-page__content {
+  padding-top: 30px;
+}
+
+.test-2-product-page__vendor {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.test-2-product-page h1 {
+  margin: 0 0 20px;
+  font-size: clamp(30px, 5vw, 60px);
+  font-weight: 400;
+}
+
+.test-2-product-page__price {
+  margin-bottom: 30px;
+  font-size: 18px;
+}
+
+.test-2-product-page__description {
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.test-2-product-page__button {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+.test-2-product-page__button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media screen and (max-width: 749px) {
+
+  .test-2-product-page {
+    padding: 30px 16px;
+  }
+
+  .test-2-product-page__inner {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+}
+
+</style>
+
+
+{% schema %}
+{
+  "name": "Test 2 Product Page",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Test 2 Product Page"
+    }
+  ]
+}
+{% endschema %}

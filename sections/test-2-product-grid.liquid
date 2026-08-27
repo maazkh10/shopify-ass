@@ -1,0 +1,855 @@
+{{ 'test-2-product-card.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="test-2-grid-section"
+  data-test-2-grid
+>
+
+  <div class="test-2-grid__inner">
+
+    {% if section.settings.heading != blank %}
+      <div class="test-2-grid__header">
+        <h2 class="test-2-grid__heading">
+          {{ section.settings.heading }}
+        </h2>
+      </div>
+    {% endif %}
+
+
+    {% if section.settings.collection != blank %}
+
+      {% assign selected_collection = section.settings.collection %}
+
+      <div
+        class="test-2-grid"
+        data-product-grid
+        style="
+          --test-2-columns: {{ section.settings.columns }};
+          --test-2-gap: {{ section.settings.gap }}px;
+        "
+      >
+
+        {% for product in selected_collection.products
+          limit: section.settings.products_to_show
+        %}
+
+          {% render 'test-2-product-card',
+            product: product,
+            show_vendor: section.settings.show_vendor,
+            show_secondary: section.settings.show_secondary
+          %}
+
+        {% else %}
+
+          <div class="test-2-grid__empty">
+            <p>No products found in this collection.</p>
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <div class="test-2-grid__empty">
+        <p>Select a collection to display products.</p>
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</section>
+
+
+<script>
+(function () {
+
+  /*
+  ============================================================
+  TEST 2 PRODUCT GRID
+  ============================================================
+  */
+
+  function initTest2ProductGrid() {
+
+    const grid = document.querySelector('[data-product-grid]');
+
+    if (!grid) {
+      return;
+    }
+
+
+    /*
+    ============================================================
+    IMAGE FALLBACK & SWAP
+    ============================================================
+    */
+
+    function updateProductImage(card, imageUrl, imageAlt) {
+
+      const image = card.querySelector('.test-2-card__image');
+
+      if (!image) {
+        return;
+      }
+
+      /*
+        If the selected variant doesn't have a unique image URL,
+        retain the current image or fallback to card primary image dataset
+      */
+      const fallbackUrl = card.dataset.defaultImage || image.src;
+      const targetUrl = (imageUrl && imageUrl.trim() !== '') ? imageUrl : fallbackUrl;
+
+      if (!targetUrl) {
+        return;
+      }
+
+      // Update image source
+      image.src = targetUrl;
+
+      /*
+        Remove srcset so the browser drops the cached responsive srcset 
+        and updates to the new image URL immediately.
+      */
+      image.removeAttribute('srcset');
+
+      if (imageAlt) {
+        image.alt = imageAlt;
+      }
+    }
+
+
+    /*
+    ============================================================
+    PRICE
+    ============================================================
+    */
+
+    function updateProductPrice(card, price, comparePrice) {
+
+      const priceElement = card.querySelector('[data-price]');
+
+      if (!priceElement) {
+        return;
+      }
+
+      const currentPrice =
+        priceElement.querySelector('.test-2-card__current-price');
+
+      const compareElement =
+        priceElement.querySelector('[data-compare-price]');
+
+
+      if (currentPrice && price) {
+        currentPrice.textContent = price;
+      }
+
+
+      if (!compareElement) {
+        return;
+      }
+
+
+      if (
+        comparePrice &&
+        comparePrice !== 'Rs. 0.00' &&
+        comparePrice !== '$0.00' &&
+        comparePrice !== '0' &&
+        comparePrice.trim() !== ''
+      ) {
+
+        compareElement.textContent = comparePrice;
+
+        compareElement.hidden = false;
+
+        priceElement.classList.add(
+          'test-2-card__price--sale'
+        );
+
+      } else {
+
+        compareElement.textContent = '';
+
+        compareElement.hidden = true;
+
+        priceElement.classList.remove(
+          'test-2-card__price--sale'
+        );
+
+      }
+
+    }
+
+
+    /*
+    ============================================================
+    PRODUCT LINKS
+    ============================================================
+    */
+
+    function updateProductLinks(card, variantUrl) {
+
+      if (!variantUrl) {
+        return;
+      }
+
+      const links =
+        card.querySelectorAll('[data-product-link]');
+
+      links.forEach(function (link) {
+        link.href = variantUrl;
+      });
+
+    }
+
+
+    /*
+    ============================================================
+    QUICK ADD BUTTON
+    ============================================================
+    */
+
+    function updateQuickAddButton(
+      card,
+      variantId,
+      available
+    ) {
+
+      const button =
+        card.querySelector('[data-quick-add]');
+
+      if (!button) {
+        return;
+      }
+
+      button.dataset.variantId = variantId;
+
+      const isAvailable = String(available) === 'true';
+
+      if (isAvailable) {
+
+        button.disabled = false;
+
+        button.removeAttribute('aria-disabled');
+
+        button.classList.remove('is-disabled');
+
+      } else {
+
+        button.disabled = true;
+
+        button.setAttribute(
+          'aria-disabled',
+          'true'
+        );
+
+        button.classList.add('is-disabled');
+
+      }
+
+    }
+
+
+    /*
+    ============================================================
+    SOLD OUT MESSAGE
+    ============================================================
+    */
+
+    function updateSoldOutMessage(card, available) {
+
+      const message =
+        card.querySelector('[data-sold-out-message]');
+
+      if (!message) {
+        return;
+      }
+
+      const isAvailable = String(available) === 'true';
+
+      if (isAvailable) {
+
+        message.hidden = true;
+
+      } else {
+
+        message.hidden = false;
+
+      }
+
+    }
+
+
+    /*
+    ============================================================
+    SELECTED SWATCH
+    ============================================================
+    */
+
+    function updateSelectedSwatch(card, selectedSwatch) {
+
+      const swatches =
+        card.querySelectorAll(
+          '.test-2-card__swatch'
+        );
+
+
+      swatches.forEach(function (swatch) {
+
+        swatch.classList.remove(
+          'is-selected'
+        );
+
+        swatch.setAttribute(
+          'aria-pressed',
+          'false'
+        );
+
+      });
+
+
+      selectedSwatch.classList.add(
+        'is-selected'
+      );
+
+      selectedSwatch.setAttribute(
+        'aria-pressed',
+        'true'
+      );
+
+    }
+
+
+    /*
+    ============================================================
+    UPDATE WHOLE CARD
+    ============================================================
+    */
+
+    function updateCardState(card, swatch) {
+
+      if (!card || !swatch) {
+        return;
+      }
+
+
+      const variantId =
+        swatch.dataset.variantId;
+
+      const variantUrl =
+        swatch.dataset.variantUrl;
+
+      const available =
+        swatch.dataset.variantAvailable;
+
+      const imageUrl =
+        swatch.dataset.variantImage;
+
+      const imageAlt =
+        swatch.dataset.variantImageAlt;
+
+      const price =
+        swatch.dataset.variantPriceFormatted;
+
+      const comparePrice =
+        swatch.dataset.variantComparePriceFormatted;
+
+
+      if (!variantId) {
+        return;
+      }
+
+
+      /*
+      IMAGE
+      */
+
+      updateProductImage(
+        card,
+        imageUrl,
+        imageAlt
+      );
+
+
+      /*
+      PRICE
+      */
+
+      updateProductPrice(
+        card,
+        price,
+        comparePrice
+      );
+
+
+      /*
+      PRODUCT URL
+      */
+
+      updateProductLinks(
+        card,
+        variantUrl
+      );
+
+
+      /*
+      QUICK ADD
+      */
+
+      updateQuickAddButton(
+        card,
+        variantId,
+        available
+      );
+
+
+      /*
+      SOLD OUT
+      */
+
+      updateSoldOutMessage(
+        card,
+        available
+      );
+
+
+      /*
+      SELECTED SWATCH
+      */
+
+      updateSelectedSwatch(
+        card,
+        swatch
+      );
+
+
+      /*
+      SAVE CURRENT VARIANT
+      */
+
+      card.dataset.variantId =
+        variantId;
+
+    }
+
+
+    /*
+    ============================================================
+    COLOR SWATCH CLICK
+    ============================================================
+    */
+
+    grid.addEventListener(
+      'click',
+      function (event) {
+
+        const swatch =
+          event.target.closest(
+            '.test-2-card__swatch'
+          );
+
+
+        if (!swatch) {
+          return;
+        }
+
+
+        const card =
+          swatch.closest(
+            '[data-product-card]'
+          );
+
+
+        if (!card) {
+          return;
+        }
+
+        /*
+          Update card state on swatch click regardless of stock status 
+          (so image and state toggle correctly).
+        */
+        updateCardState(
+          card,
+          swatch
+        );
+
+      }
+    );
+
+
+    /*
+    ============================================================
+    QUICK ADD
+    ============================================================
+    */
+
+    grid.addEventListener(
+      'click',
+      async function (event) {
+
+        const button =
+          event.target.closest(
+            '[data-quick-add]'
+          );
+
+
+        if (!button) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        if (button.disabled) {
+          return;
+        }
+
+
+        const card =
+          button.closest(
+            '[data-product-card]'
+          );
+
+
+        if (!card) {
+          return;
+        }
+
+
+        /*
+        IMPORTANT:
+        Get the currently selected variant.
+        */
+
+        const variantId =
+          button.dataset.variantId ||
+          card.dataset.variantId;
+
+
+        if (!variantId) {
+
+          console.error(
+            'No variant ID found.'
+          );
+
+          return;
+        }
+
+
+        const errorElement =
+          card.querySelector(
+            '[data-quick-add-error]'
+          );
+
+
+        /*
+        Clear previous error.
+        */
+
+        if (errorElement) {
+
+          errorElement.textContent = '';
+
+          errorElement.hidden = true;
+
+        }
+
+
+        /*
+        Prevent double clicking.
+        */
+
+        button.disabled = true;
+
+        button.classList.add(
+          'is-loading'
+        );
+
+
+        try {
+
+          /*
+          ======================================================
+          ADD PRODUCT TO SHOPIFY CART
+          ======================================================
+          */
+
+          const response =
+            await fetch(
+              '{{ routes.cart_add_url }}.js',
+              {
+                method: 'POST',
+
+                headers: {
+                  'Content-Type':
+                    'application/json',
+
+                  'Accept':
+                    'application/json'
+                },
+
+                body: JSON.stringify({
+
+                  items: [
+
+                    {
+                      id: Number(variantId),
+
+                      quantity: 1
+                    }
+
+                  ]
+
+                })
+
+              }
+            );
+
+
+          /*
+          ======================================================
+          CHECK RESPONSE
+          ======================================================
+          */
+
+          if (!response.ok) {
+
+            const errorData =
+              await response.json()
+                .catch(function () {
+                  return {};
+                });
+
+
+            throw new Error(
+              errorData.description ||
+              errorData.message ||
+              'Unable to add product to cart.'
+            );
+
+          }
+
+
+          const cartItem =
+            await response.json();
+
+
+          console.log(
+            'Successfully added:',
+            cartItem
+          );
+
+
+          /*
+          ======================================================
+          GO TO SHOPIFY CART
+          ======================================================
+          */
+
+          window.location.href =
+            '{{ routes.cart_url }}';
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            'Cart error:',
+            error
+          );
+
+
+          if (errorElement) {
+
+            errorElement.textContent =
+              error.message ||
+              'Could not add this product to cart.';
+
+            errorElement.hidden = false;
+
+          }
+
+
+          button.disabled = false;
+
+          button.classList.remove(
+            'is-loading'
+          );
+
+        }
+
+      }
+    );
+
+
+    /*
+    ============================================================
+    INITIALIZE PRODUCT CARDS
+    ============================================================
+    */
+
+    const cards =
+      grid.querySelectorAll(
+        '[data-product-card]'
+      );
+
+
+    cards.forEach(function (card) {
+
+      const selectedSwatch =
+        card.querySelector(
+          '.test-2-card__swatch.is-selected'
+        );
+
+
+      /*
+      Use selected swatch if one exists.
+      */
+
+      if (selectedSwatch) {
+
+        updateCardState(
+          card,
+          selectedSwatch
+        );
+
+        return;
+      }
+
+
+      /*
+      Otherwise use first swatch.
+      */
+
+      const firstSwatch =
+        card.querySelector(
+          '.test-2-card__swatch'
+        );
+
+
+      if (firstSwatch) {
+
+        updateCardState(
+          card,
+          firstSwatch
+        );
+
+      }
+
+    });
+
+  }
+
+
+  /*
+  ============================================================
+  NORMAL PAGE LOAD
+  ============================================================
+  */
+
+  if (document.readyState === 'loading') {
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      initTest2ProductGrid
+    );
+
+  } else {
+
+    initTest2ProductGrid();
+
+  }
+
+
+  /*
+  ============================================================
+  SHOPIFY THEME EDITOR
+  ============================================================
+  */
+
+  document.addEventListener(
+    'shopify:section:load',
+    function (event) {
+
+      if (
+        event.target.querySelector(
+          '[data-test-2-grid]'
+        )
+      ) {
+
+        initTest2ProductGrid();
+
+      }
+
+    }
+  );
+
+})();
+</script>
+
+
+{% schema %}
+{
+  "name": "Test 2 - Product Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Best Sellers"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Product collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Products per row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Space between products",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product brand",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary",
+      "label": "Show product type",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Test 2 - Product Grid"
+    }
+  ]
+}
+{% endschema %}

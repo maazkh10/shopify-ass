@@ -1,0 +1,393 @@
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+  if current_variant == blank
+    assign current_variant = product.variants.first
+  endif
+
+  assign color_option_index = -1
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase | strip
+
+    if option_name == 'color' or option_name == 'colour'
+      assign color_option_index = forloop.index0
+    endif
+  endfor
+
+  assign has_compare_price = false
+
+  if current_variant.compare_at_price > current_variant.price
+    assign has_compare_price = true
+  endif
+
+  assign is_clearance = false
+  assign is_final_sale = false
+
+  if product.tags contains 'clearance'
+    assign is_clearance = true
+  endif
+
+  if product.tags contains 'final-sale'
+    assign is_final_sale = true
+  endif
+%}
+
+
+<article
+  class="test-2-card{% unless current_variant.available %} is-unavailable{% endunless %}"
+  data-product-card
+  data-product-id="{{ product.id }}"
+  data-product-handle="{{ product.handle }}"
+>
+
+
+  <!-- =========================================
+       IMAGE
+  ========================================== -->
+
+  <div class="test-2-card__media">
+
+    <div class="test-2-card__badges">
+
+      {% if is_clearance %}
+        <span class="test-2-card__badge test-2-card__badge--clearance">
+          Clearance
+        </span>
+      {% endif %}
+
+      {% if is_final_sale %}
+        <span class="test-2-card__badge test-2-card__badge--final-sale">
+          Final Sale
+        </span>
+      {% endif %}
+
+    </div>
+
+
+    <a
+      href="{{ product.url }}?variant={{ current_variant.id }}"
+      class="test-2-card__image-link"
+      data-product-link
+    >
+
+      {% if current_variant.featured_image != blank %}
+
+        {{
+          current_variant.featured_image
+          | image_url: width: 900
+          | image_tag:
+            class: 'test-2-card__image',
+            loading: 'lazy',
+            widths: '300, 450, 600, 750, 900',
+            sizes: '(min-width: 1200px) 25vw, (min-width: 750px) 50vw, 100vw',
+            alt: current_variant.featured_image.alt | default: product.title
+        }}
+
+      {% elsif product.featured_image != blank %}
+
+        {{
+          product.featured_image
+          | image_url: width: 900
+          | image_tag:
+            class: 'test-2-card__image',
+            loading: 'lazy',
+            widths: '300, 450, 600, 750, 900',
+            sizes: '(min-width: 1200px) 25vw, (min-width: 750px) 50vw, 100vw',
+            alt: product.featured_image.alt | default: product.title
+        }}
+
+      {% else %}
+
+        <div class="test-2-card__image-placeholder">
+          <span>Image unavailable</span>
+        </div>
+
+      {% endif %}
+
+    </a>
+
+
+    <!-- =========================================
+         COLOR SWATCHES
+    ========================================== -->
+
+    {% if color_option_index >= 0 %}
+
+      <div
+        class="test-2-card__swatches"
+        data-swatches
+        aria-label="Choose a colour"
+      >
+
+        {% assign displayed_colors = '' %}
+        {% assign color_count = 0 %}
+
+
+        {% for variant in product.variants %}
+
+          {% assign color_value = variant.options[color_option_index] %}
+
+          {% unless displayed_colors contains color_value %}
+
+            {% assign displayed_colors = displayed_colors
+              | append: '||'
+              | append: color_value
+              | append: '||'
+            %}
+
+            {% assign color_count = color_count | plus: 1 %}
+
+
+            {% if color_count <= 6 %}
+
+              {% liquid
+                assign color_lower = color_value | downcase | strip
+
+                case color_lower
+                  when 'black'
+                    assign swatch_color = '#111111'
+                  when 'white'
+                    assign swatch_color = '#ffffff'
+                  when 'red'
+                    assign swatch_color = '#d92d20'
+                  when 'blue'
+                    assign swatch_color = '#2878d0'
+                  when 'green'
+                    assign swatch_color = '#2f8f5b'
+                  when 'yellow'
+                    assign swatch_color = '#e7c83d'
+                  when 'pink'
+                    assign swatch_color = '#e38aaa'
+                  when 'purple'
+                    assign swatch_color = '#7a4bb7'
+                  when 'orange'
+                    assign swatch_color = '#e67e22'
+                  when 'brown'
+                    assign swatch_color = '#795548'
+                  when 'grey'
+                    assign swatch_color = '#777777'
+                  when 'gray'
+                    assign swatch_color = '#777777'
+                  when 'beige'
+                    assign swatch_color = '#d8c3a5'
+                  else
+                    assign swatch_color = '#cccccc'
+                endcase
+
+
+                assign variant_image_url = ''
+                assign variant_image_alt = product.title
+
+                if variant.featured_image != blank
+
+                  assign variant_image_url = variant.featured_image | image_url: width: 900
+                  assign variant_image_alt = variant.featured_image.alt | default: product.title
+
+                else
+
+                  comment
+                    Fallback:
+                    Find a product image whose ALT text contains
+                    the color name.
+                  endcomment
+
+                  for product_image in product.images
+
+                    assign image_alt_lower = product_image.alt | default: '' | downcase
+                    assign color_lower_for_image = color_value | downcase
+
+                    if image_alt_lower contains color_lower_for_image
+
+                      assign variant_image_url = product_image | image_url: width: 900
+                      assign variant_image_alt = product_image.alt | default: product.title
+                      break
+
+                    endif
+
+                  endfor
+
+                endif
+              %}
+
+
+              <button
+                type="button"
+                class="test-2-card__swatch{% if variant.id == current_variant.id %} is-selected{% endif %}{% unless variant.available %} is-sold-out{% endunless %}"
+
+                style="background-color: {{ swatch_color }};"
+
+                data-variant-id="{{ variant.id }}"
+
+                data-variant-url="{{ product.url }}?variant={{ variant.id }}"
+
+                data-variant-available="{{ variant.available }}"
+
+                data-variant-price="{{ variant.price }}"
+
+                data-variant-price-formatted="{{ variant.price | money | escape }}"
+
+                data-variant-compare-price="{{ variant.compare_at_price | default: 0 }}"
+
+                data-variant-compare-price-formatted="{{ variant.compare_at_price | money | escape }}"
+
+                data-variant-image="{{ variant_image_url }}"
+
+                data-variant-image-alt="{{ variant_image_alt | escape }}"
+
+                data-color="{{ color_value | escape }}"
+
+                aria-label="{{ color_value | escape }}"
+
+                aria-pressed="{% if variant.id == current_variant.id %}true{% else %}false{% endif %}"
+
+                {% unless variant.available %}
+                  aria-disabled="true"
+                {% endunless %}
+              >
+              </button>
+
+
+            {% endif %}
+
+          {% endunless %}
+
+        {% endfor %}
+
+
+        {% assign remaining_colors = color_count | minus: 6 %}
+
+        {% if remaining_colors > 0 %}
+
+          <button
+            type="button"
+            class="test-2-card__swatch-more"
+            data-more-colors
+          >
+            +{{ remaining_colors }}
+          </button>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- =========================================
+         SOLD OUT
+    ========================================== -->
+
+    <div
+      class="test-2-card__sold-out"
+      data-sold-out-message
+      {% if current_variant.available %}
+        hidden
+      {% endif %}
+    >
+      <span>Sold Out</span>
+    </div>
+
+
+    <!-- =========================================
+         QUICK ADD
+    ========================================== -->
+
+    <button
+      type="button"
+      class="test-2-card__quick-add"
+      data-quick-add
+
+      data-variant-id="{{ current_variant.id }}"
+
+      aria-label="Add {{ product.title | escape }} to cart"
+
+      {% unless current_variant.available %}
+        disabled
+      {% endunless %}
+    >
+
+      <span class="test-2-card__quick-add-icon">
+        +
+      </span>
+
+    </button>
+
+
+    <p
+      class="test-2-card__quick-add-error"
+      data-quick-add-error
+      role="alert"
+      hidden
+    ></p>
+
+  </div>
+
+
+  <!-- =========================================
+       PRODUCT INFORMATION
+  ========================================== -->
+
+  <div class="test-2-card__info">
+
+    {% if show_vendor %}
+
+      <p class="test-2-card__vendor">
+        {{ product.vendor }}
+      </p>
+
+    {% endif %}
+
+
+    <a
+      href="{{ product.url }}?variant={{ current_variant.id }}"
+      class="test-2-card__product-link"
+      data-product-link
+    >
+
+      <h3 class="test-2-card__title">
+        {{ product.title }}
+      </h3>
+
+
+      {% if show_secondary and product.type != blank %}
+
+        <p class="test-2-card__secondary">
+          {{ product.type }}
+        </p>
+
+      {% endif %}
+
+
+      <div
+        class="test-2-card__price{% if has_compare_price %} test-2-card__price--sale{% endif %}"
+        data-price
+      >
+
+        <span class="test-2-card__current-price">
+          {{ current_variant.price | money }}
+        </span>
+
+
+        <span
+          class="test-2-card__compare-price"
+          data-compare-price
+
+          {% unless has_compare_price %}
+            hidden
+          {% endunless %}
+        >
+
+          {% if has_compare_price %}
+            {{ current_variant.compare_at_price | money }}
+          {% endif %}
+
+        </span>
+
+      </div>
+
+    </a>
+
+  </div>
+
+</article>

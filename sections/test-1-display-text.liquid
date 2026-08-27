@@ -1,0 +1,46 @@
+<section class="test-1-display-text">
+
+  {% if section.settings.fill_image != blank %}
+
+    <h2
+      class="test-1-display-text__heading"
+      style="
+        --display-image: url('{{ section.settings.fill_image | image_url: width: 2000 }}');
+      "
+    >
+      {{ section.settings.text }}
+    </h2>
+
+  {% else %}
+
+    <h2 class="test-1-display-text__heading">
+      {{ section.settings.text }}
+    </h2>
+
+  {% endif %}
+
+</section>
+
+{% schema %}
+{
+  "name": "Test 1 - Display Text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Display text",
+      "default": "Best sellers"
+    },
+    {
+      "type": "image_picker",
+      "id": "fill_image",
+      "label": "Text fill image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Test 1 - Display Text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,454 @@
+<section
+  class="test-1-hero test-1-hero--button-{{ section.settings.button_position }}"
+>
+  {% if section.settings.background_image != blank %}
+    {{
+      section.settings.background_image
+      | image_url: width: 2400
+      | image_tag:
+        class: 'test-1-hero__image',
+        loading: 'eager',
+        widths: '750, 1100, 1500, 2000, 2400',
+        sizes: '100vw',
+        alt: section.settings.background_image.alt
+    }}
+  {% endif %}
+
+  <div class="test-1-hero__overlay">
+    <div class="test-1-hero__content">
+
+      {% if section.settings.headline_image != blank %}
+        {{
+          section.settings.headline_image
+          | image_url: width: 1000
+          | image_tag:
+            class: 'test-1-hero__headline-image',
+            loading: 'eager',
+            alt: section.settings.headline_text
+        }}
+      {% elsif section.settings.headline_text != blank %}
+        <h1 class="test-1-hero__headline">
+          {{ section.settings.headline_text }}
+        </h1>
+      {% endif %}
+
+      {% if section.settings.button_label != blank %}
+        <a
+          href="{{ section.settings.button_link | default: '#' }}"
+          class="test-1-hero__button"
+        >
+          {{ section.settings.button_label }}
+        </a>
+      {% endif %}
+
+    </div>
+  </div>
+
+
+  {% comment %}
+    =========================================================
+    REVIEWS TAB
+    =========================================================
+
+    show_reviews = OFF
+      → nothing appears
+
+    show_reviews = ON
+      + display
+        → normal tab
+
+      + popup
+        → button opens reviews modal
+
+      + link
+        → normal link
+  {% endcomment %}
+
+  {% if section.settings.show_reviews %}
+
+    {% case section.settings.reviews_behavior %}
+
+      {% when 'display' %}
+
+        <span
+          class="test-1-reviews"
+          aria-label="{{ section.settings.reviews_label }}"
+        >
+          {{ section.settings.reviews_label }}
+        </span>
+
+
+      {% when 'popup' %}
+
+        <button
+          type="button"
+          class="test-1-reviews"
+          data-reviews-open="{{ section.id }}"
+          aria-label="Open customer reviews"
+          aria-haspopup="dialog"
+          aria-controls="ReviewsModal-{{ section.id }}"
+        >
+          {{ section.settings.reviews_label }}
+        </button>
+
+
+      {% when 'link' %}
+
+        {% if section.settings.reviews_link != blank %}
+
+          <a
+            href="{{ section.settings.reviews_link }}"
+            class="test-1-reviews"
+            aria-label="Read customer reviews"
+          >
+            {{ section.settings.reviews_label }}
+          </a>
+
+        {% else %}
+
+          <span
+            class="test-1-reviews"
+            aria-label="{{ section.settings.reviews_label }}"
+          >
+            {{ section.settings.reviews_label }}
+          </span>
+
+        {% endif %}
+
+    {% endcase %}
+
+  {% endif %}
+
+
+  {% comment %}
+    =========================================================
+    REVIEWS POPUP
+    =========================================================
+  {% endcomment %}
+
+  {% if section.settings.show_reviews
+    and section.settings.reviews_behavior == 'popup'
+  %}
+
+    <div
+      id="ReviewsModal-{{ section.id }}"
+      class="test-1-reviews-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ReviewsModalTitle-{{ section.id }}"
+      hidden
+    >
+
+      <div
+        class="test-1-reviews-modal__overlay"
+        data-reviews-close="{{ section.id }}"
+      ></div>
+
+      <div class="test-1-reviews-modal__content">
+
+        <button
+          type="button"
+          class="test-1-reviews-modal__close"
+          data-reviews-close="{{ section.id }}"
+          aria-label="Close reviews"
+        >
+          &times;
+        </button>
+
+        <h2
+          id="ReviewsModalTitle-{{ section.id }}"
+          class="test-1-reviews-modal__title"
+        >
+          {{ section.settings.reviews_heading }}
+        </h2>
+
+        {% if section.settings.review_1_text != blank %}
+          <article class="test-1-review">
+            <div
+              class="test-1-review__rating"
+              aria-label="{{ section.settings.review_1_rating }} out of 5 stars"
+            >
+              {% for i in (1..5) %}
+                {% if i <= section.settings.review_1_rating %}
+                  ★
+                {% else %}
+                  ☆
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <p class="test-1-review__text">
+              "{{ section.settings.review_1_text }}"
+            </p>
+
+            {% if section.settings.review_1_author != blank %}
+              <p class="test-1-review__author">
+                — {{ section.settings.review_1_author }}
+              </p>
+            {% endif %}
+          </article>
+        {% endif %}
+
+
+        {% if section.settings.review_2_text != blank %}
+          <article class="test-1-review">
+            <div
+              class="test-1-review__rating"
+              aria-label="{{ section.settings.review_2_rating }} out of 5 stars"
+            >
+              {% for i in (1..5) %}
+                {% if i <= section.settings.review_2_rating %}
+                  ★
+                {% else %}
+                  ☆
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <p class="test-1-review__text">
+              "{{ section.settings.review_2_text }}"
+            </p>
+
+            {% if section.settings.review_2_author != blank %}
+              <p class="test-1-review__author">
+                — {{ section.settings.review_2_author }}
+              </p>
+            {% endif %}
+          </article>
+        {% endif %}
+
+
+        {% if section.settings.review_3_text != blank %}
+          <article class="test-1-review">
+            <div
+              class="test-1-review__rating"
+              aria-label="{{ section.settings.review_3_rating }} out of 5 stars"
+            >
+              {% for i in (1..5) %}
+                {% if i <= section.settings.review_3_rating %}
+                  ★
+                {% else %}
+                  ☆
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <p class="test-1-review__text">
+              "{{ section.settings.review_3_text }}"
+            </p>
+
+            {% if section.settings.review_3_author != blank %}
+              <p class="test-1-review__author">
+                — {{ section.settings.review_3_author }}
+              </p>
+            {% endif %}
+          </article>
+        {% endif %}
+
+      </div>
+    </div>
+
+  {% endif %}
+
+</section>
+
+
+{% schema %}
+{
+  "name": "Test 1 - Hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "headline_image",
+      "label": "Headline image"
+    },
+    {
+      "type": "text",
+      "id": "headline_text",
+      "label": "Headline text",
+      "default": "Spring Break"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "SHOP THE COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+
+    {
+  "type": "select",
+  "id": "button_position",
+  "label": "Button position",
+  "options": [
+    {
+      "value": "center",
+      "label": "Center"
+    },
+    {
+      "value": "top",
+      "label": "Top"
+    },
+    {
+      "value": "bottom",
+      "label": "Bottom"
+    },
+    {
+      "value": "left",
+      "label": "Left"
+    },
+    {
+      "value": "right",
+      "label": "Right"
+    }
+  ],
+  "default": "center"
+},
+
+    {
+      "type": "header",
+      "content": "Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show reviews tab",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "reviews_behavior",
+      "label": "Reviews tab behavior",
+      "options": [
+        {
+          "value": "display",
+          "label": "Display only"
+        },
+        {
+          "value": "popup",
+          "label": "Open reviews popup"
+        },
+        {
+          "value": "link",
+          "label": "Open a link"
+        }
+      ],
+      "default": "display"
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Reviews tab label",
+      "default": "REVIEWS"
+    },
+    {
+      "type": "url",
+      "id": "reviews_link",
+      "label": "Reviews link"
+    },
+
+    {
+      "type": "text",
+      "id": "reviews_heading",
+      "label": "Popup heading",
+      "default": "Customer Reviews"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 1"
+    },
+    {
+      "type": "range",
+      "id": "review_1_rating",
+      "label": "Rating",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "textarea",
+      "id": "review_1_text",
+      "label": "Review text",
+      "default": "Amazing quality and beautiful fit!"
+    },
+    {
+      "type": "text",
+      "id": "review_1_author",
+      "label": "Customer name",
+      "default": "Sarah"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 2"
+    },
+    {
+      "type": "range",
+      "id": "review_2_rating",
+      "label": "Rating",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "textarea",
+      "id": "review_2_text",
+      "label": "Review text",
+      "default": "I absolutely love it!"
+    },
+    {
+      "type": "text",
+      "id": "review_2_author",
+      "label": "Customer name",
+      "default": "Emma"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 3"
+    },
+    {
+      "type": "range",
+      "id": "review_3_rating",
+      "label": "Rating",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "textarea",
+      "id": "review_3_text",
+      "label": "Review text",
+      "default": "Fast delivery and great quality."
+    },
+    {
+      "type": "text",
+      "id": "review_3_author",
+      "label": "Customer name",
+      "default": "Olivia"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Test 1 - Hero"
+    }
+  ]
+}
+{% endschema %}

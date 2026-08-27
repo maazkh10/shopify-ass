@@ -1,0 +1,251 @@
+<section class="test-1-drop">
+
+  <!-- LEFT PANEL -->
+
+  <div
+    class="test-1-drop__panel test-1-drop__left"
+    {% if section.settings.pattern_image != blank %}
+      style="
+        background-image: url('{{ section.settings.pattern_image | image_url: width: 1200 }}');
+      "
+    {% endif %}
+  >
+    <div class="test-1-drop__left-content">
+
+      <h2 class="test-1-drop__heading">
+        {{ section.settings.left_heading }}
+      </h2>
+
+      <div
+        class="test-1-countdown"
+        data-countdown="{{ section.settings.target_date }}T{{ section.settings.target_time }}"
+      >
+
+        <div class="test-1-countdown__item">
+          <div class="test-1-countdown__value">
+            <span
+              class="test-1-countdown__digit"
+              data-days
+            >00</span>
+          </div>
+
+          <span class="test-1-countdown__label">
+            Days
+          </span>
+        </div>
+
+        <div class="test-1-countdown__item">
+          <div class="test-1-countdown__value">
+            <span
+              class="test-1-countdown__digit"
+              data-hours
+            >00</span>
+          </div>
+
+          <span class="test-1-countdown__label">
+            Hours
+          </span>
+        </div>
+
+        <div class="test-1-countdown__item">
+          <div class="test-1-countdown__value">
+            <span
+              class="test-1-countdown__digit"
+              data-minutes
+            >00</span>
+          </div>
+
+          <span class="test-1-countdown__label">
+            Minutes
+          </span>
+        </div>
+
+        <div class="test-1-countdown__item">
+          <div class="test-1-countdown__value">
+            <span
+              class="test-1-countdown__digit"
+              data-seconds
+            >00</span>
+          </div>
+
+          <span class="test-1-countdown__label">
+            Seconds
+          </span>
+        </div>
+
+        <p
+          class="test-1-drop__message"
+          data-countdown-finished
+          hidden
+        >
+          {{ section.settings.finished_message }}
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- RIGHT PANEL -->
+
+  <div class="test-1-drop__panel test-1-drop__right">
+
+    {% if section.settings.right_image != blank %}
+      {{
+        section.settings.right_image
+        | image_url: width: 1600
+        | image_tag:
+          class: 'test-1-drop__image',
+          loading: 'lazy',
+          widths: '600, 900, 1200, 1600',
+          sizes: '(min-width: 750px) 50vw, 100vw',
+          alt: section.settings.right_image.alt
+      }}
+    {% endif %}
+
+    <p class="test-1-drop__caption">
+      {{ section.settings.right_caption }}
+    </p>
+
+    {% form 'customer', class: 'test-1-drop__form' %}
+
+      <input
+        type="hidden"
+        name="contact[tags]"
+        value="newsletter"
+      >
+
+      <div>
+        <label
+          class="test-1-drop__form-label"
+          for="NewsletterEmail-{{ section.id }}"
+        >
+          {{ section.settings.email_label }}
+        </label>
+
+        <input
+          id="NewsletterEmail-{{ section.id }}"
+          class="test-1-drop__input"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          autocomplete="email"
+          required
+          placeholder="{{ section.settings.email_placeholder }}"
+          aria-label="{{ section.settings.email_label }}"
+        >
+      </div>
+
+      <button
+        type="submit"
+        class="test-1-drop__button"
+      >
+        {{ section.settings.button_label }}
+      </button>
+
+      {% if form.posted_successfully? %}
+        <p class="test-1-drop__message test-1-drop__message--success">
+          {{ section.settings.success_message }}
+        </p>
+      {% endif %}
+
+      {% if form.errors %}
+        <p
+          class="test-1-drop__message test-1-drop__message--error"
+          role="alert"
+        >
+          {{ section.settings.error_message }}
+        </p>
+      {% endif %}
+
+    {% endform %}
+
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "Test 1 - Drop Teaser",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "pattern_image",
+      "label": "Background pattern"
+    },
+    {
+      "type": "text",
+      "id": "left_heading",
+      "label": "Countdown heading",
+      "default": "New drop coming soon"
+    },
+   {
+  "type": "text",
+  "id": "target_date",
+  "label": "Countdown date",
+  "info": "Use YYYY-MM-DD format.",
+  "default": "2026-12-31"
+},
+{
+  "type": "text",
+  "id": "target_time",
+  "label": "Countdown time",
+  "info": "Use 24-hour HH:MM format.",
+  "default": "20:00"
+},
+    {
+      "type": "text",
+      "id": "finished_message",
+      "label": "Countdown finished message",
+      "default": "The drop is live!"
+    },
+    {
+      "type": "image_picker",
+      "id": "right_image",
+      "label": "Right panel image"
+    },
+    {
+      "type": "text",
+      "id": "right_caption",
+      "label": "Image caption",
+      "default": "Sneak peek..."
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email label",
+      "default": "Get notified"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "NOTIFY ME"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks! We'll notify you."
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "Error message",
+      "default": "Please enter a valid email address."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Test 1 - Drop Teaser"
+    }
+  ]
+}
+{% endschema %}

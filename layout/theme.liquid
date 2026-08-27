@@ -13,9 +13,13 @@
     </title>
 
     {{ content_for_header }}
+
+    {{ 'test-1.css' | asset_url | stylesheet_tag }}
   </head>
 
   <body>
     {{ content_for_layout }}
+
+    <script src="{{ 'test-1.js' | asset_url }}" defer></script>
   </body>
 </html>
