@@ -1,14 +1,59 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "hello_world": {
-      "type": "hello-world",
+    "test_1_hero_4wBdjM": {
+      "type": "test-1-hero",
+      "name": "Test 1 - Hero",
       "settings": {
-        "heading": "HELLO SHOPIFY 👋",
-        "description": "My Shopify theme is working!"
+        "background_image": "shopify://shop_images/Frame_43.png",
+        "headline_text": "Spring Break",
+        "button_label": "SHOP THE COLLECTION",
+        "button_link": "",
+        "button_position": "center",
+        "show_reviews": true,
+        "reviews_behavior": "display",
+        "reviews_label": "REVIEWS",
+        "reviews_link": "",
+        "reviews_heading": "Customer Reviews",
+        "review_1_rating": 5,
+        "review_1_text": "Amazing quality and beautiful fit!",
+        "review_1_author": "Sarah",
+        "review_2_rating": 5,
+        "review_2_text": "I absolutely love it!",
+        "review_2_author": "Emma",
+        "review_3_rating": 5,
+        "review_3_text": "Fast delivery and great quality.",
+        "review_3_author": "Olivia"
+      }
+    },
+    "test_1_drop_teaser_dXyYDE": {
+      "type": "test-1-drop-teaser",
+      "name": "Test 1 - Drop Teaser",
+      "settings": {
+        "left_heading": "New drop coming soon",
+        "target_date": "2026-09-31",
+        "target_time": "20:00",
+        "finished_message": "The drop is live!",
+        "right_image": "shopify://shop_images/2.2.jpg",
+        "right_caption": "Sneak peek...",
+        "email_label": "Get notified",
+        "email_placeholder": "Enter your email",
+        "button_label": "NOTIFY ME",
+        "success_message": "Thanks! We'll notify you.",
+        "error_message": "Please enter a valid email address."
       }
     }
   },
   "order": [
-    "hello_world"
+    "test_1_hero_4wBdjM",
+    "test_1_drop_teaser_dXyYDE"
   ]
 }
