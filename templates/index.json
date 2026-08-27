@@ -50,10 +50,19 @@
         "success_message": "Thanks! We'll notify you.",
         "error_message": "Please enter a valid email address."
       }
+    },
+    "test_1_display_text_eqhBDk": {
+      "type": "test-1-display-text",
+      "name": "Test 1 - Display Text",
+      "settings": {
+        "text": "Best sellers",
+        "fill_image": "shopify://shop_images/photo-1581182815808-b6eb627a8798.avif"
+      }
     }
   },
   "order": [
     "test_1_hero_4wBdjM",
-    "test_1_drop_teaser_dXyYDE"
+    "test_1_drop_teaser_dXyYDE",
+    "test_1_display_text_eqhBDk"
   ]
 }
